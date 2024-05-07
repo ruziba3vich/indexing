@@ -6,8 +6,10 @@ import (
 	"log"
 	"os"
 
+	"github.com/gin-gonic/gin"
 	_ "github.com/lib/pq"
 	loader "github.com/ruziba3vich/dummy_people"
+	"github.com/ruziba3vich/indexing/internal/handlers"
 )
 
 func main() {
@@ -32,11 +34,14 @@ func main() {
 		log.Fatal(err)
 	}
 
-	ok, err := loader.LoadFromDatabase(db)
+	_, err = loader.LoadFromDatabase(db)
 	if err != nil {
 		log.Println(err)
 	}
-	if ok {
-		fmt.Println("ok")
-	}
+
+	r := gin.Default()
+
+	r.POST("/create-index", func(c *gin.Context) {
+		handlers.CreateIndexHandler(c, db)
+	})
 }
